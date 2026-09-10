@@ -1,10 +1,12 @@
 pipeline {
-    agent any
+    agent {
+        label 'docker-builder'
+    }
 
     options {
         skipDefaultCheckout(true)
         disableConcurrentBuilds()
-        timeout(time: 5, unit: 'MINUTES')
+        timeout(time: 15, unit: 'MINUTES')
         timestamps()
     }
 
@@ -12,38 +14,52 @@ pipeline {
         stage('Checkout') {
             steps {
                 checkout scm
+                script {
+                    def commit = sh(
+                        script: 'git rev-parse --short=12 HEAD',
+                        returnStdout: true
+                    ).trim()
+                    env.IMAGE_TAG = "cicd-lab:git-${commit}-build-${env.BUILD_NUMBER}"
+                }
             }
         }
 
-        stage('Check project files') {
+        stage('Check source and tools') {
             steps {
                 sh '''
                     set -eu
-
-                    echo "Commit:"
-                    git rev-parse --short HEAD
-
-                    echo "Application version:"
-                    cat VERSION
-
+                    docker version
+                    python3 --version
+                    curl --version
                     test -s app/server.py
                     test -s Dockerfile
-                    test -s helm/cicd-web/Chart.yaml
-
-                    for script in scripts/build.sh scripts/start.sh scripts/smoke-test.sh; do
+                    test -s VERSION
+                    for script in scripts/*.sh; do
                         bash -n "$script"
                     done
                 '''
+            }
+        }
+
+        stage('Build image') {
+            steps {
+                sh 'docker build -t "$IMAGE_TAG" .'
+            }
+        }
+
+        stage('Test image') {
+            steps {
+                sh 'bash scripts/test-image.sh "$IMAGE_TAG"'
             }
         }
     }
 
     post {
         success {
-            echo 'Source checks passed.'
+            echo "Image passed the smoke test: ${env.IMAGE_TAG}"
         }
         failure {
-            echo 'Pipeline failed. Inspect the failed stage.'
+            echo 'Pipeline failed. Inspect the failed stage and container logs.'
         }
     }
 }
