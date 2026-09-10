@@ -1,0 +1,7 @@
+.git
+dist/
+test-ci-cd-/
+__pycache__/
+*.pyc
+*.log
+.env
