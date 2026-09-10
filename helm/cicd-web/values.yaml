@@ -1,0 +1,17 @@
+replicaCount: 2
+
+image:
+  repository: cicd-lab
+  tag: "0.2.0"
+  pullPolicy: Never
+
+service:
+  port: 80
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 64Mi
+  limits:
+    cpu: 500m
+    memory: 128Mi
