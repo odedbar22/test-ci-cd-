@@ -8,3 +8,5 @@ export APP_VERSION="${APP_VERSION:-$(cat VERSION)}"
 export PORT="${PORT:-8080}"
 
 exec python3 -u app/server.py
+
+if
