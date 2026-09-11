@@ -85,6 +85,7 @@ pipeline {
                     '''
                 }
             }
+	}
 	stage('Deploy to Minikube') {
             steps {
                 sh 'bash scripts/deploy-local.sh "$IMAGE_TAG"'
