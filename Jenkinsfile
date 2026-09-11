@@ -59,7 +59,7 @@ pipeline {
         stage('Publish image to GHCR') {
             steps {
                 withCredentials([usernamePassword(
-                    credentialsId: 'ghcr',
+                    credentialsId: 'ghcr-push',
                     usernameVariable: 'GHCR_USER',
                     passwordVariable: 'GHCR_TOKEN'
                 )]) {
