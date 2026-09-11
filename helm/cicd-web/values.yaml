@@ -1,9 +1,12 @@
 replicaCount: 2
 
 image:
-  repository: cicd-lab
-  tag: "0.2.0"
-  pullPolicy: Never
+  repository: ghcr.io/odedbar22/cicd-lab
+  tag: "set-by-pipeline"
+  pullPolicy: Always
+
+imagePullSecrets:
+  - name: ghcr-pull
 
 service:
   port: 80

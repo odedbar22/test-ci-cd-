@@ -2,16 +2,16 @@
 set -euo pipefail
 
 IMAGE="${1:?Usage: deploy-local.sh IMAGE}"
-TAG="${IMAGE#cicd-lab:}"
+REPOSITORY="ghcr.io/odedbar22/cicd-lab"
 
-if [[ "$IMAGE" != cicd-lab:* ]]; then
-    echo "Expected an image tagged cicd-lab:TAG" >&2
+if [[ "$IMAGE" != "$REPOSITORY":* ]]; then
+    echo "Expected image from $REPOSITORY" >&2
     exit 1
 fi
 
-echo "Deploying tested image: $IMAGE"
+TAG="${IMAGE#"$REPOSITORY":}"
 
-minikube image load "$IMAGE"
+echo "Deploying registry image: $IMAGE"
 
 helm lint ./helm/cicd-web
 
@@ -19,9 +19,9 @@ helm upgrade --install cicd-web ./helm/cicd-web \
     --kube-context minikube \
     --namespace cicd-lab \
     --create-namespace \
-    --set-string image.repository=cicd-lab \
+    --set-string image.repository="$REPOSITORY" \
     --set-string image.tag="$TAG" \
-    --set-string image.pullPolicy=Never \
+    --set-string image.pullPolicy=Always \
     --wait \
     --timeout 180s
 

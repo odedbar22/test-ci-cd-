@@ -24,6 +24,7 @@ pipeline {
                         returnStdout: true
                     ).trim()
                     env.IMAGE_TAG = "cicd-lab:git-${commit}-build-${env.BUILD_NUMBER}"
+		    env.REGISTRY_IMAGE = "ghcr.io/odedbar22/${env.IMAGE_TAG}"
                 }
             }
         }
@@ -88,12 +89,12 @@ pipeline {
 	}
 	stage('Deploy to Minikube') {
             steps {
-                sh 'bash scripts/deploy-local.sh "$IMAGE_TAG"'
+                sh 'bash scripts/deploy-local.sh "$REGISTRY_IMAGE"'
             }
         }
         stage('Verify deployment') {
             steps {
-                sh 'bash scripts/test-deployment.sh "$IMAGE_TAG"'
+                sh 'bash scripts/test-deployment.sh "$REGISTRY_IMAGE"'
             }
         }
     }
