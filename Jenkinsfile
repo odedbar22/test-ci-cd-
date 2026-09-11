@@ -58,6 +58,9 @@ pipeline {
             }
         }
         stage('Publish image to GHCR') {
+	    when {
+                branch 'main'
+            }
             steps {
                 withCredentials([usernamePassword(
                     credentialsId: 'ghcr-push',
@@ -88,11 +91,17 @@ pipeline {
             }
 	}
 	stage('Deploy to Minikube') {
+	    when {
+                branch 'main'
+            }
             steps {
                 sh 'bash scripts/deploy-local.sh "$REGISTRY_IMAGE"'
             }
         }
         stage('Verify deployment') {
+	    when {
+                branch 'main'
+            }
             steps {
                 sh 'bash scripts/test-deployment.sh "$REGISTRY_IMAGE"'
             }
