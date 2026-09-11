@@ -58,6 +58,11 @@ pipeline {
                 sh 'bash scripts/deploy-local.sh "$IMAGE_TAG"'
             }
         }
+        stage('Verify deployment') {
+            steps {
+                sh 'bash scripts/test-deployment.sh "$IMAGE_TAG"'
+            }
+        }
     }
 
     post {
