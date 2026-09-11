@@ -6,7 +6,8 @@ COPY app/server.py app/server.py
 COPY scripts/start.sh scripts/start.sh
 COPY VERSION VERSION
 
-RUN chmod +x scripts/start.sh
+RUN chmod 0755 /app /app/app /app/scripts /app/scripts/start.sh \
+    && chmod 0644 /app/app/server.py /app/VERSION
 
 USER 10001:10001
 
