@@ -56,7 +56,35 @@ pipeline {
                 sh 'bash scripts/test-image.sh "$IMAGE_TAG"'
             }
         }
+        stage('Publish image to GHCR') {
+            steps {
+                withCredentials([usernamePassword(
+                    credentialsId: 'ghcr',
+                    usernameVariable: 'GHCR_USER',
+                    passwordVariable: 'GHCR_TOKEN'
+                )]) {
+                    sh '''
+                        set +x
+                        set -eu
 
+                        export DOCKER_CONFIG="$(mktemp -d)"
+                        trap 'rm -rf "$DOCKER_CONFIG"' EXIT
+
+                        printf '%s' "$GHCR_TOKEN" |
+                            docker login ghcr.io \
+                                --username "$GHCR_USER" \
+                                --password-stdin
+
+                        TAG="${IMAGE_TAG#cicd-lab:}"
+                        REMOTE_IMAGE="ghcr.io/odedbar22/cicd-lab:${TAG}"
+
+                        docker tag "$IMAGE_TAG" "$REMOTE_IMAGE"
+                        docker push "$REMOTE_IMAGE"
+
+                        echo "Published: $REMOTE_IMAGE"
+                    '''
+                }
+            }
 	stage('Deploy to Minikube') {
             steps {
                 sh 'bash scripts/deploy-local.sh "$IMAGE_TAG"'
