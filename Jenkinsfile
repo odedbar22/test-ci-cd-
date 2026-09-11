@@ -8,10 +8,11 @@ pipeline {
         disableConcurrentBuilds()
         timeout(time: 15, unit: 'MINUTES')
         timestamps()
-	triggers {
+    }
+
+    triggers {
         pollSCM('H/2 * * * *')
     }
-    }	
 
     stages {
         stage('Checkout') {
