@@ -1,0 +1,8 @@
+services:
+  web:
+    image: cicd-lab:0.2.0
+    ports:
+      - "127.0.0.1:8083:8080"
+    environment:
+      PORT: "8080"
+    restart: unless-stopped
